@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PseudoMediatR.DependencyInjection.Configuration;
 
 namespace PseudoMediatR.DependencyInjection
 {
@@ -10,7 +9,7 @@ namespace PseudoMediatR.DependencyInjection
         /// </summary>
         public static IServiceCollection AddPseudoMediatR(this IServiceCollection services)
         {
-            var configuration = PseudoMediatRConfiguration.CreateConfiguration(services);
+            var configuration = PseudoMediatRDIConfiguration.CreateConfiguration(services);
 
             configuration.InjectSender();
 
@@ -19,9 +18,9 @@ namespace PseudoMediatR.DependencyInjection
         /// <summary>
         /// Configuration setup for injecting the services
         /// </summary>
-        public static IServiceCollection AddPseudoMediatR(this IServiceCollection services, Action<PseudoMediatRConfiguration> setupConfiguration)
+        public static IServiceCollection AddPseudoMediatR(this IServiceCollection services, Action<PseudoMediatRDIConfiguration> setupConfiguration)
         {
-            var configuration = PseudoMediatRConfiguration.CreateConfiguration(services);
+            var configuration = PseudoMediatRDIConfiguration.CreateConfiguration(services);
 
             setupConfiguration(configuration);
 

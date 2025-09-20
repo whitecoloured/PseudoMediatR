@@ -3,14 +3,14 @@ using System.Reflection;
 
 namespace PseudoMediatR.DependencyInjection.Configuration
 {
-    public sealed class PseudoMediatRConfiguration
+    public sealed class PseudoMediatRDIConfiguration
     {
         private ServiceLifetime Lifetime { get; set; } = ServiceLifetime.Transient; //default lifetime
         private Assembly Assembly { get; set; } = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly(); //default assembly
 
         private readonly IServiceCollection services;
 
-        private PseudoMediatRConfiguration(IServiceCollection services)
+        private PseudoMediatRDIConfiguration(IServiceCollection services)
         {
             this.services = services;
         }
@@ -19,14 +19,14 @@ namespace PseudoMediatR.DependencyInjection.Configuration
         /// Creation of instance of PseudoMediatRConfiguration
         /// </summary>
         /// <returns>Instance of PseudoMediatrConfiguration</returns>
-        public static PseudoMediatRConfiguration CreateConfiguration(IServiceCollection services)
+        public static PseudoMediatRDIConfiguration CreateConfiguration(IServiceCollection services)
         {
-            return new PseudoMediatRConfiguration(services);
+            return new PseudoMediatRDIConfiguration(services);
         }
         /// <summary>
         /// (Optional) Set lifetime for sender and request handlers. Note that you should call it before InjectHandlers() or InjectHandlers() methods. The default lifetime value is Transient
         /// </summary>
-        public PseudoMediatRConfiguration SetLifetime(ServiceLifetime givenLifetime)
+        public PseudoMediatRDIConfiguration SetLifetime(ServiceLifetime givenLifetime)
         {
             Lifetime = givenLifetime;
             return this;
@@ -35,7 +35,7 @@ namespace PseudoMediatR.DependencyInjection.Configuration
         /// <summary>
         /// Injection of sender to DI container. Use sender if you need to work with request handers implicitly.
         /// </summary>
-        public PseudoMediatRConfiguration InjectSender()
+        public PseudoMediatRDIConfiguration InjectSender()
         {
             switch (Lifetime)
             {
@@ -63,7 +63,7 @@ namespace PseudoMediatR.DependencyInjection.Configuration
         /// <summary>
         /// Injection of request handlers to DI container. Use request handlers if you need to work with request handlers explicitly.
         /// </summary>
-        public PseudoMediatRConfiguration InjectHandlers()
+        public PseudoMediatRDIConfiguration InjectHandlers()
         {
             var assemblies = Assembly.GetTypes()
                                 .Where(p => p.IsClass || !p.IsAbstract)
@@ -107,7 +107,7 @@ namespace PseudoMediatR.DependencyInjection.Configuration
         /// <summary>
         /// (Optional) Set assembly where you want to inject the services. Note that you should call it before InjectHandlers() or InjectHandlers() methods.
         /// </summary>
-        public PseudoMediatRConfiguration SetAssembly(Assembly givenAssembly)
+        public PseudoMediatRDIConfiguration SetAssembly(Assembly givenAssembly)
         {
             Assembly = givenAssembly;
             return this;

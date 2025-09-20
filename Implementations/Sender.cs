@@ -82,30 +82,16 @@ namespace PseudoMediatR.Implementations
                 throw new AmbiguousMatchException("The request handler can't implement HandleAsync() method twice.");
             }
 
-            var taskResult = methods.First().Invoke(handler, [request, ct]) as Task;
+            var taskResult = methods.First().Invoke(handler, [request, ct]) as Task<TResponse>;
 
             if (taskResult is null)
             {
-                throw new ArgumentNullException("Can't fetch the Task variable from the MethodInfo variable.");
+                throw new ArgumentNullException("Can't fetch Task<TResponse> variable from MethodInfo variable.");
             }
 
-            await taskResult;
+            var response = await taskResult;
 
-            var propertyInfo = taskResult?.GetType()?.GetProperty("Result");
-
-            if (propertyInfo is null)
-            {
-                throw new ArgumentNullException("Can't fetch the Result attribute from the Task variable");
-            }
-
-            var response = propertyInfo?.GetValue(taskResult);
-
-            if (response is null)
-            {
-                return default;
-            }
-
-            return (TResponse)response;
+            return response;
         }
     }
 }
