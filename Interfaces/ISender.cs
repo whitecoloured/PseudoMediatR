@@ -11,7 +11,8 @@ namespace PseudoMediatR.Interfaces
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        TResponse Send<TResponse>(IRequest<TResponse> request);
+        TResponse Send<TRequest, TResponse>(TRequest request)
+            where TRequest : IRequest<TResponse>;
         /// <summary>
         /// Handles asynchronous requests. Request handlers must implement IAsyncRequestHandler interface.
         /// </summary>
@@ -20,6 +21,7 @@ namespace PseudoMediatR.Interfaces
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken ct=default);
+        Task<TResponse> SendAsync<TRequest, TResponse>(TRequest request, CancellationToken ct=default)
+            where TRequest : IRequest<TResponse>;
     }
 }

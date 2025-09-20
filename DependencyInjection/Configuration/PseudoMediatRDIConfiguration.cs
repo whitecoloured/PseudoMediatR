@@ -33,7 +33,7 @@ namespace PseudoMediatR.DependencyInjection.Configuration
         }
 
         /// <summary>
-        /// Injection of sender to DI container. Use sender if you need to work with request handers implicitly.
+        /// Injection of sender to DI container. Must be called with InjectHandlers(). Use sender if you need to work with request handers implicitly.
         /// </summary>
         public PseudoMediatRDIConfiguration InjectSender()
         {
@@ -61,7 +61,7 @@ namespace PseudoMediatR.DependencyInjection.Configuration
         }
 
         /// <summary>
-        /// Injection of request handlers to DI container. Use request handlers if you need to work with request handlers explicitly.
+        /// Injection of request handlers to DI container. Can be called without InjectSender(). Use request handlers if you need to work with request handlers explicitly or via sender.
         /// </summary>
         public PseudoMediatRDIConfiguration InjectHandlers()
         {

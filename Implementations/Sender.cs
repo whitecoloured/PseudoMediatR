@@ -1,95 +1,34 @@
-﻿using System.Reflection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace PseudoMediatR.Implementations
 {
     public sealed class Sender : ISender
     {
-        public TResponse Send<TResponse>(IRequest<TResponse> request)
+        private readonly IServiceProvider _servicePrvoider;
+        public Sender(IServiceProvider serviceProvider)
         {
-            var requestType = request.GetType();
+            _servicePrvoider = serviceProvider;
+        }
+        public TResponse Send<TRequest, TResponse>(TRequest request)
+            where TRequest : IRequest<TResponse>
+        {
+            var handler = _servicePrvoider.GetService<IRequestHandler<TRequest, TResponse>>()
+                ?? throw new ArgumentNullException("The request handler doesn't implement IRequestHandler<,> interface. Either you haven't registered the handler.");
 
-            var responseType = typeof(TResponse);
+            var response = handler.Handle(request);
 
-            var handlerType = Assembly.GetEntryAssembly()?.GetTypes()
-                                .Where(p => p.GetInterfaces()
-                                            .Contains(typeof(IRequestHandler<,>)
-                                            .MakeGenericType(requestType, responseType)))
-                                .FirstOrDefault();
-
-            if (handlerType is null)
-            {
-                throw new ArgumentNullException("The request handler doesn't implement IRequestHandler interface.");
-            }
-
-            var handler = Activator.CreateInstance(handlerType);
-
-            var methods = handlerType.GetMethods()
-                            .Where(p => p.Name == "Handle")
-                            .ToArray();
-
-
-            if (methods.Length == 0)
-            {
-                throw new ArgumentNullException("The Handle() method wasn't implemented.");
-            }
-
-            if (methods.Length > 1)
-            {
-                throw new AmbiguousMatchException("The request handler can't implement Handle() method twice.");
-            }
-
-            var response = methods.First().Invoke(handler, [request]);
-
-            if (response is null)
-            {
-                return default;
-            }
-
-            return (TResponse)response;
+            return response;
 
         }
 
-        public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, CancellationToken ct=default)
+        public async Task<TResponse> SendAsync<TRequest, TResponse>(TRequest request, CancellationToken ct=default)
+            where TRequest : IRequest<TResponse>
         {
-            var requestType = request.GetType();
 
-            var responseType = typeof(TResponse);
+            var handler = _servicePrvoider.GetService<IAsyncRequestHandler<TRequest, TResponse>>()
+                ?? throw new ArgumentNullException("The request handler doesn't implement IAsyncRequestHandler<,> interface. Either you haven't registered the handler.");
 
-            var handlerType = Assembly.GetEntryAssembly()?.GetTypes()
-                                .Where(p => p.GetInterfaces()
-                                            .Contains(typeof(IAsyncRequestHandler<,>)
-                                            .MakeGenericType(requestType, responseType)))
-                                .FirstOrDefault();
-
-            if (handlerType is null)
-            {
-                throw new ArgumentNullException("The request handler doesn't implement IAsyncRequestHandler interface.");
-            }
-
-            var handler = Activator.CreateInstance(handlerType);
-
-            var methods = handlerType.GetMethods()
-                            .Where(p => p.Name == "HandleAsync")
-                            .ToArray();
-
-            if (methods.Length == 0)
-            {
-                throw new ArgumentNullException("The HandleAsync() method wasn't implemented.");
-            }
-
-            if (methods.Length > 1)
-            {
-                throw new AmbiguousMatchException("The request handler can't implement HandleAsync() method twice.");
-            }
-
-            var taskResult = methods.First().Invoke(handler, [request, ct]) as Task<TResponse>;
-
-            if (taskResult is null)
-            {
-                throw new ArgumentNullException("Can't fetch Task<TResponse> variable from MethodInfo variable.");
-            }
-
-            var response = await taskResult;
+            var response = await handler.HandleAsync(request, ct);
 
             return response;
         }

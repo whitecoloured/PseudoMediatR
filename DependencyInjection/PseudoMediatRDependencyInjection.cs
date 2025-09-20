@@ -11,7 +11,7 @@ namespace PseudoMediatR.DependencyInjection
         {
             var configuration = PseudoMediatRDIConfiguration.CreateConfiguration(services);
 
-            configuration.InjectSender();
+            configuration.InjectHandlers().InjectSender();
 
             return services;
         }
