@@ -11,12 +11,24 @@ The repository contains the implementation of the popular library **MediatR**, w
 - `Implementations/` — ready implementations of contracts (Sender).
 - `Interfaces/` — contracts for further usage (ISender, IRequest, IRequestHandler, IAsyncRequestHandler).
 
-## 🚀 Usage Example
+## 🚀 Usage Examples
+
+- First Example
 
 ```csharp
 app.MapPost("/one", ([FromServices] ISender sender, [FromBody] OneRequest request) =>
 {
     var response = sender.Send<OneRequest, OneResponse>(request);
+    return Results.Ok(response);
+});
+```
+
+- Second Example
+
+```csharp
+app.MapPost("/one", ([FromServices]IRequestHandler<OneRequest, OneResponse> handler, [FromBody] OneRequest request) =>
+{
+    var response = handler.Handle(request);
     return Results.Ok(response);
 });
 ```
