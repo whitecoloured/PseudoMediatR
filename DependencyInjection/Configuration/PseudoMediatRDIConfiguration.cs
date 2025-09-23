@@ -37,26 +37,7 @@ namespace PseudoMediatR.DependencyInjection.Configuration
         /// </summary>
         public PseudoMediatRDIConfiguration InjectSender()
         {
-            switch (Lifetime)
-            {
-                case ServiceLifetime.Transient:
-                    {
-                        services.AddTransient<ISender, Sender>();
-                        break;
-                    }
-                case ServiceLifetime.Scoped:
-                    {
-                        services.AddScoped<ISender, Sender>();
-                        break;
-                    }
-                case ServiceLifetime.Singleton:
-                    {
-                        services.AddSingleton<ISender, Sender>();
-                        break;
-                    }
-                default:
-                    break;
-            }
+            services.Add(new ServiceDescriptor(typeof(ISender), typeof(Sender), Lifetime));
             return this;
         }
 
@@ -65,7 +46,7 @@ namespace PseudoMediatR.DependencyInjection.Configuration
         /// </summary>
         public PseudoMediatRDIConfiguration InjectHandlers()
         {
-            var assemblies = Assembly.GetTypes()
+            var types = Assembly.GetTypes()
                                 .Where(p => p.IsClass || !p.IsAbstract)
                                 .SelectMany(impl => impl.GetInterfaces()
                                                     .Where(inter => inter.IsGenericType &&
@@ -80,26 +61,7 @@ namespace PseudoMediatR.DependencyInjection.Configuration
                                 )
                                 .ToArray();
 
-            switch (Lifetime)
-            {
-                case ServiceLifetime.Transient:
-                    {
-                        AddHandlers(assemblies, (interfaceAssembly, classAssembly) => services.AddTransient(interfaceAssembly, classAssembly));
-                        break;
-                    }
-                case ServiceLifetime.Scoped:
-                    {
-                        AddHandlers(assemblies, (interfaceAssembly, classAssembly) => services.AddScoped(interfaceAssembly, classAssembly));
-                        break;
-                    }
-                case ServiceLifetime.Singleton:
-                    {
-                        AddHandlers(assemblies, (interfaceAssembly, classAssembly) => services.AddSingleton(interfaceAssembly, classAssembly));
-                        break;
-                    }
-                default:
-                    break;
-            }
+            AddHandlers(types, (interfaceType, classType) => services.Add(new ServiceDescriptor(interfaceType, classType, Lifetime)));
 
             return this;
         }
@@ -113,11 +75,11 @@ namespace PseudoMediatR.DependencyInjection.Configuration
             return this;
         }
 
-        private static void AddHandlers(IEnumerable<(Type interfaceAssembly, Type classAssembly)> assemblies, Action<Type, Type> addHandler)
+        private static void AddHandlers(IEnumerable<(Type interfaceAssembly, Type classAssembly)> types, Action<Type, Type> addHandler)
         {
-            foreach (var (interfaceAssembly, classAssembly) in assemblies)
+            foreach (var (interfaceType, classType) in types)
             {
-                addHandler(interfaceAssembly, classAssembly);
+                addHandler(interfaceType, classType);
             }
         }
 

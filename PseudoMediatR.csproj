@@ -8,10 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
-	  <Using Include="PseudoMediatR.DependencyInjection.Configuration"/>
-	  <Using Include="PseudoMediatR.DependencyInjection"/>
-	  <Using Include="PseudoMediatR.Implementations"/>
-	  <Using Include="PseudoMediatR.Interfaces"/>
+	  <Using Include="PseudoMediatR.DependencyInjection.Configuration" />
+	  <Using Include="PseudoMediatR.DependencyInjection" />
+	  <Using Include="PseudoMediatR.Implementations" />
+	  <Using Include="PseudoMediatR.Interfaces" />
+	  <Using Include="PseudoMediatR.ReturnTypes" />
   </ItemGroup>
 
 </Project>

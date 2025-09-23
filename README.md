@@ -10,6 +10,7 @@ The repository contains the implementation of the popular library **MediatR**, w
 - `DependencyInjection/` — ready extensions for injection of the services that are used in the library.
 - `Implementations/` — ready implementations of contracts (Sender).
 - `Interfaces/` — contracts for further usage (ISender, IRequest, IRequestHandler, IAsyncRequestHandler).
+- `ReturnTypes/` — ready return types for request handlers.
 
 ## 🚀 Usage Examples
 
